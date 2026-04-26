@@ -50,7 +50,8 @@ flowchart LR
 
   %% Flows
   FE -->|HTTPS REST| API
-  FE <-->|Socket.IO (rooms)| API
+  FE -->|Socket IO connect| API
+  API -->|Realtime events (rooms)| FE
 
   API <-->|CRUD + indexes| DB
   DB --- Mongo_Collections
