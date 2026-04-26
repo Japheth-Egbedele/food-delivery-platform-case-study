@@ -10,64 +10,34 @@ This is a high-level view of the runtime components and the main data flows (HTT
 
 ```mermaid
 flowchart LR
-  %% Clients
   subgraph Clients
-    FE["React Frontend\n(Customer / Staff / Admin)"]
+    FE["React Frontend (Customer / Staff / Admin)"]
   end
 
-  %% Backend
   subgraph Backend
     API["Node.js / Express API"]
-    REST["REST Routes"]
-    AUTH["Auth (JWT)"]
-    WH["Webhooks"]
-    RT["Socket.IO"]
     JOBS["Agenda Jobs"]
   end
 
-  API --> REST
-  API --> AUTH
-  API --> WH
-  API --> RT
-
-  %% Data stores and external services
-  DB[("MongoDB")]
-  MON["Monnify Payments"]
-  CLOUD["Cloudinary (Media)"]
-
-  subgraph Mongo_Collections[MongoDB: Core Collections]
-    O["Orders"]
-    U["Users"]
-    S["Staff"]
-    ST["Stores"]
+  subgraph Data
+    DB["MongoDB"]
+    MON["Monnify Payments"]
+    CLOUD["Cloudinary Media"]
   end
 
-  subgraph Mongo_Ledgers[MongoDB: Ledgers / Audit]
-    WTX["WalletTransactions"]
-    EC["EscrowCredits"]
-    RR["ReferralRewards"]
-  end
+  FE --> API
+  API --> FE
 
-  %% Flows
-  FE -->|HTTPS REST| API
-  FE -->|Socket IO connect| API
-  API -->|Realtime events (rooms)| FE
+  API --> DB
+  DB --> API
 
-  API <-->|CRUD + indexes| DB
-  DB --- Mongo_Collections
-  DB --- Mongo_Ledgers
+  API --> MON
+  MON --> API
 
-  API -->|Init transactions| MON
-  MON -->|Webhook (HMAC SHA-512)| API
-  API -->|Disbursement status sync| MON
+  API --> CLOUD
 
-  API -->|Uploads / transforms| CLOUD
-
-  JOBS <-->|Recurring jobs| DB
-  JOBS -->|Reconciliation / releases| API
-
-  NOTE["Documentation-only diagram\n(no proprietary code)"]
-  NOTE -.-> API
+  JOBS --> DB
+  DB --> JOBS
 ```
 
 ---
@@ -838,14 +808,3 @@ This documentation is released under the MIT License. The described system and i
 **Timeline:** 8 weeks (March - April 2026)  
 **Status:** Live in production
 ```
-
----
-
-## INSTRUCTIONS FOR CURSOR
-
-1. **Create the repo:**
-   ```bash
-   mkdir food-delivery-platform-case-study
-   cd food-delivery-platform-case-study
-   git init
-   ```
